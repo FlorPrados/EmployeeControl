@@ -10,5 +10,7 @@ namespace EmployeeControl
         }
 
         public DbSet<Employee> Employees => Set<Employee>();
+        public DbSet<TimeEntrance> TimeEntrances => Set<TimeEntrance>();
+        public DbSet<TimeExit> TimeExits => Set<TimeExit>();
     }
 }
