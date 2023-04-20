@@ -25,12 +25,12 @@ namespace EmployeeControl.Controllers
                 return BadRequest("Ya se le ha asignado un horario de salida al empleado con ID " + timeExitDTO.EmployeeId);
             }
 
-            //TimeEntranceDTO timeEntranceDTO = await;
-            //var assignedEntrance= await context.TimeEntrances.AnyAsync(t => t.EmployeeId == timeEntranceDTO.EmployeeId && t.Day == timeEntranceDTO.Day);
-            //if (!assignedEntrance)
-            //{
-            //    return BadRequest($"El empleado con ID {timeExitDTO.EmployeeId} no ha registrado una entrada ");
-            //}
+            var timeEntrance = await context.TimeEntrances
+                .SingleOrDefaultAsync(entrance => entrance.EmployeeId == timeExitDTO.EmployeeId && entrance.Day == timeExitDTO.Day);
+            if (timeEntrance == null)
+            {
+                return BadRequest($"El empleado con ID {timeExitDTO.EmployeeId} no ha registado una entrada");
+            }
 
             var timeExit = new TimeExit
 
@@ -83,3 +83,9 @@ namespace EmployeeControl.Controllers
 
     }
 }
+
+
+// SingleOrDefaultAsync:
+// Es un método de consulta de Entity Framework que busca un ùnico registro que cumpla con una condición específica.
+// En este caso, se está buscando un TimeEntrance que tenga el mismo EmployeeId y Day que el TimeExit que se está intentando agregar.
+
