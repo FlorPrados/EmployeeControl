@@ -17,27 +17,23 @@ namespace EmployeeControl.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(TimeExitDTO timeExitDTO)
+        public async Task<IActionResult> Post(int id)
         {
-            var alreadyAssigned = await context.TimeExits.AnyAsync(t => t.EmployeeId == timeExitDTO.EmployeeId && t.Day == timeExitDTO.Day);
-            if (alreadyAssigned) 
-            {
-                return BadRequest("Ya se le ha asignado un horario de salida al empleado con ID " + timeExitDTO.EmployeeId);
-            }
-
+            var today = DateTime.Now.ToString("dd-MM-yyyy");
             var timeEntrance = await context.TimeEntrances
-                .SingleOrDefaultAsync(entrance => entrance.EmployeeId == timeExitDTO.EmployeeId && entrance.Day == timeExitDTO.Day);
-            if (timeEntrance == null)
+                .SingleOrDefaultAsync(entrance => entrance.EmployeeId == id && entrance.Day == today);
+
+            var alreadyAssigned = await context.TimeExits.AnyAsync(t => t.EmployeeId == id && t.Day == today);
+            if (alreadyAssigned || timeEntrance == null) 
             {
-                return BadRequest($"El empleado con ID {timeExitDTO.EmployeeId} no ha registado una entrada");
+                return NotFound();
             }
 
             var timeExit = new TimeExit
-
             {
-                EmployeeId = timeExitDTO.EmployeeId,
-                Day = timeExitDTO.Day,
-                Hour = timeExitDTO.Hour
+                EmployeeId = id,
+                Day = DateTime.Now.ToString("dd-MM-yyyy"),
+                Hour = DateTime.Now.ToString("HH-mm")
             };
 
             context.Add(timeExit);
@@ -46,25 +42,20 @@ namespace EmployeeControl.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TimeEntrance>>> Get()
+        public async Task<ActionResult<IEnumerable<TimeExit>>> Get()
         {
-            return await context.TimeEntrances.OrderBy(time => time.Day).ToListAsync();
+            return await context.TimeExits.OrderBy(time => time.Day).ToListAsync();
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<TimeExit>> Get2(int id)
+        [HttpGet("id")]
+        public async Task<ActionResult<IEnumerable<TimeExit>>> GetV2(int id)
         {
-            var record = await context.TimeExits
-                 .Include(rec => rec.Hour)
-                 .Include(rec => rec.employee)
-                     .ThenInclude(emp => emp.Fullname)
-                 .FirstOrDefaultAsync(rec => rec.Id == id);
-
-            if (record is null)
+            var idFound = await context.TimeExits.AnyAsync(e => e.EmployeeId == id);
+            if (!idFound)
             {
                 return NotFound();
             }
-            return record;
+            return await context.TimeExits.Where(e => e.EmployeeId == id).ToListAsync();
         }
 
 

@@ -3,6 +3,7 @@ using EmployeeControl.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace EmployeeControl.Controllers
 {
     [ApiController]
@@ -43,11 +44,14 @@ namespace EmployeeControl.Controllers
         }
 
         [HttpGet("id")]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetV2(string name)
+        public async Task<ActionResult<IEnumerable<Employee>>> GetV2(int id)
         {
-            // trae datos de todas las filas que contengan ese nombre
- 
-            return await context.Employees.Where(s => s.Fullname.Contains(name)).ToListAsync();
+            var idFound = await context.Employees.AnyAsync(e => e.Id == id);
+            if (!idFound)
+            {
+                return NotFound();
+            }
+            return await context.Employees.Where(e => e.Id == id).ToListAsync();
         }
 
 
@@ -55,6 +59,11 @@ namespace EmployeeControl.Controllers
         [HttpPut("{id:int}")] //modelo desconectado
         public async Task<ActionResult> Put(int id, EmployeeDTO employeeDTO)
         {
+            var idFound = await context.Employees.AnyAsync(e => e.Id == id);
+            if (!idFound)
+            {
+                return NotFound();
+            }
             var employee = new Employee
             {
                 Fullname = employeeDTO.Fullname,
@@ -67,21 +76,6 @@ namespace EmployeeControl.Controllers
 
         }
 
-        //[HttpPatch("{id:int}")]
-        //public async Task<ActionResult> Patch(int id, EmployeeDTO employeeDTO)
-        //{
-            
-        //    var employee = new Employee
-        //    {
-        //        Email = employeeDTO.Email
-        //    };
-        //    employee.Id = id;
-        //    context.Update(employee);
-        //    await context.SaveChangesAsync();
-        //    return Ok();
-
-        //}
-
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -93,6 +87,59 @@ namespace EmployeeControl.Controllers
             context.Remove(employee);
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+
+        [HttpGet("{id}/horarios")]
+        public async Task<ActionResult<IEnumerable<EmployeeScheduleDto>>> GetSchedule(int id)
+        {
+            //Get por empleado, que traiga tambien la data de entradas y salidas, y que las que pertenecen a el empleado, se mapeen en las propiedades de EmployeeScheduleDto 
+            var employee = await context.Employees.FindAsync(id);
+            if (employee is null)
+            {
+                return NotFound();
+            }
+
+            var entrances = context.TimeEntrances
+                .Include(b => b.employee)
+                .Where(x => x.EmployeeId == id).ToList();
+
+            var exits = context.TimeExits
+                .Include(b => b.employee)
+                .Where(x => x.EmployeeId == id).ToList();
+
+
+            List<TimeEntranceDto> eachEntrance = new();
+            List<TimeExitDto> eachExit = new();
+
+            entrances.ForEach(x =>
+            {
+                eachEntrance.Add(new TimeEntranceDto
+                {
+                    Day = x.Day,
+                    Hour = x.Hour,
+                });
+            });
+
+            exits.ForEach(x =>
+            {
+                eachExit.Add(new TimeExitDto
+                {
+                    Day = x.Day,
+                    Hour = x.Hour,
+                });
+            });
+
+
+
+            var employeeSchedule = new EmployeeScheduleDto
+            {
+                FullName = employee.Fullname,
+                Email = employee.Email,
+                TimeExits = exits.
+            }
+            return Ok();
+
         }
     }
 }

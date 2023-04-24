@@ -16,26 +16,26 @@ namespace EmployeeControl.Controllers
             this.context = context;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post(TimeEntranceDTO timeEntranceDTO)
+        [HttpPost("{id}")]
+        public async Task<IActionResult> Create(int id)
         {
-            var alreadyAssignedId = await context.TimeEntrances.AnyAsync(t => t.EmployeeId == timeEntranceDTO.EmployeeId && t.Day == timeEntranceDTO.Day);
+            var employee = context.Employees.FirstOrDefault(s => s.Id == id);
+            var today = DateTime.Now.ToString("dd-MM-yyyy");
+            var alreadyAssignedId = context.TimeEntrances.Any(t => t.EmployeeId == id && t.Day == today);
             // t especifica un determinado registro en la tabla TimeEntrances
 
-            if (alreadyAssignedId) 
+            if (alreadyAssignedId || employee is null) 
             {
-                return BadRequest("Ya se le ha asignado un horario de entrada al empleado con ID " + timeEntranceDTO.EmployeeId);
+                return NotFound();
             }
 
-
             var timeEntrance = new TimeEntrance
-
             {
-                EmployeeId = timeEntranceDTO.EmployeeId,
-                Day = timeEntranceDTO.Day,
-                Hour = timeEntranceDTO.Hour
-            }; 
-            
+                EmployeeId = id,
+                Day = DateTime.Now.ToString("dd-MM-yyyy"),
+                Hour = DateTime.Now.ToString("HH-mm")
+            };
+
             context.Add(timeEntrance);
             await context.SaveChangesAsync();
             return Ok();
@@ -47,20 +47,15 @@ namespace EmployeeControl.Controllers
             return await context.TimeEntrances.OrderBy(time => time.Day ).ToListAsync();
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<TimeEntrance>> Get2(int id)
+        [HttpGet("id")]
+        public async Task<ActionResult<IEnumerable<TimeEntrance>>> GetV2(int id)
         {
-            var record = await context.TimeEntrances
-                 .Include(rec => rec.Hour)
-                 .Include(rec => rec.employee)
-                     .ThenInclude(emp => emp.Fullname)
-                 .FirstOrDefaultAsync(rec => rec.Id == id);
-
-            if (record is null)
+            var idFound = await context.TimeEntrances.AnyAsync(e => e.EmployeeId == id);
+            if (!idFound)
             {
                 return NotFound();
             }
-            return record;
+            return await context.TimeEntrances.Where(e => e.EmployeeId == id).ToListAsync();
         }
 
 
@@ -74,7 +69,7 @@ namespace EmployeeControl.Controllers
             }
             context.Remove(timeentrance);
             await context.SaveChangesAsync();
-            return NoContent();
+            return Ok();
         }
     }
 }
