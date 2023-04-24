@@ -44,17 +44,22 @@ namespace EmployeeControl.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TimeEntrance>>> Get()
         {
+
             return await context.TimeEntrances.OrderBy(time => time.Day ).ToListAsync();
         }
 
         [HttpGet("id")]
-        public async Task<ActionResult<IEnumerable<TimeEntrance>>> GetV2(int id)
+        public async Task<ActionResult<IEnumerable<TimeEntrance>>> GetById(int id)
         {
             var idFound = await context.TimeEntrances.AnyAsync(e => e.EmployeeId == id);
             if (!idFound)
             {
                 return NotFound();
             }
+            //Traete aca la lista de TimeEntrances
+
+            // y abajo mapeala
+
             return await context.TimeEntrances.Where(e => e.EmployeeId == id).ToListAsync();
         }
 

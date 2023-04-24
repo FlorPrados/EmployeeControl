@@ -2,7 +2,7 @@
 using EmployeeControl.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Newtonsoft.Json;
 
 namespace EmployeeControl.Controllers
 {
@@ -91,7 +91,7 @@ namespace EmployeeControl.Controllers
 
 
         [HttpGet("{id}/horarios")]
-        public async Task<ActionResult<IEnumerable<EmployeeScheduleDto>>> GetSchedule(int id)
+        public async Task<IActionResult> GetSchedule(int id)
         {
             //Get por empleado, que traiga tambien la data de entradas y salidas, y que las que pertenecen a el empleado, se mapeen en las propiedades de EmployeeScheduleDto 
             var employee = await context.Employees.FindAsync(id);
@@ -108,13 +108,15 @@ namespace EmployeeControl.Controllers
                 .Include(b => b.employee)
                 .Where(x => x.EmployeeId == id).ToList();
 
-
-            List<TimeEntranceDto> eachEntrance = new();
-            List<TimeExitDto> eachExit = new();
+            var employeeSchedule = new EmployeeScheduleDto
+            {
+                FullName = employee.Fullname,
+                Email = employee.Email
+            };
 
             entrances.ForEach(x =>
             {
-                eachEntrance.Add(new TimeEntranceDto
+                employeeSchedule.TimeEntrances.Add(new TimeEntranceDto
                 {
                     Day = x.Day,
                     Hour = x.Hour,
@@ -123,22 +125,16 @@ namespace EmployeeControl.Controllers
 
             exits.ForEach(x =>
             {
-                eachExit.Add(new TimeExitDto
+                employeeSchedule.TimeExits.Add(new TimeExitDto
                 {
                     Day = x.Day,
                     Hour = x.Hour,
+
                 });
             });
 
 
-
-            var employeeSchedule = new EmployeeScheduleDto
-            {
-                FullName = employee.Fullname,
-                Email = employee.Email,
-                TimeExits = exits.
-            }
-            return Ok();
+            return Ok(employeeSchedule);
 
         }
     }
