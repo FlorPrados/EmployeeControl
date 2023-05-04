@@ -56,9 +56,6 @@ namespace EmployeeControl.Controllers
             {
                 return NotFound();
             }
-            //Traete aca la lista de TimeEntrances
-
-            // y abajo mapeala
 
             return await context.TimeEntrances.Where(e => e.EmployeeId == id).ToListAsync();
         }

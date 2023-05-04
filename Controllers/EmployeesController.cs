@@ -32,8 +32,8 @@ namespace EmployeeControl.Controllers
                 Fullname = employeeDTO.Fullname,
                 Email = employeeDTO.Email
             };
-            context.Add(employee);     //.add trabaja con entidades creadas, entonces no puedo enviarle dentro un DTO, porque no cree esa entidad
-            await context.SaveChangesAsync();    //Aquì se guarda el empleado generado en la tabla Employee
+            context.Add(employee); 
+            await context.SaveChangesAsync();    
             return Ok();
         }
 
@@ -56,7 +56,7 @@ namespace EmployeeControl.Controllers
 
 
 
-        [HttpPut("{id:int}")] //modelo desconectado
+        [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, EmployeeDTO employeeDTO)
         {
             var idFound = await context.Employees.AnyAsync(e => e.Id == id);
@@ -93,7 +93,7 @@ namespace EmployeeControl.Controllers
         [HttpGet("{id}/horarios")]
         public async Task<IActionResult> GetSchedule(int id)
         {
-            //Get por empleado, que traiga tambien la data de entradas y salidas, y que las que pertenecen a el empleado, se mapeen en las propiedades de EmployeeScheduleDto 
+       
             var employee = await context.Employees.FindAsync(id);
             if (employee is null)
             {
