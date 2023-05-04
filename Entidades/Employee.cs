@@ -1,9 +1,17 @@
-﻿namespace EmployeeControl.Entidades
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EmployeeControl.Entidades
 {
-    public class Employee
+    public class Employee : BaseEntity
     {
-        public int Id { get; set; }
+
+        [Required]
+        [StringLength(255)]
         public string Fullname { get; set; }
+
+        [Required]
+        [StringLength(255)]
         public string Email { get; set; }
+
     }
 }
