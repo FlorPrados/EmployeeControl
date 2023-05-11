@@ -1,5 +1,4 @@
-﻿
-namespace EmployeeControl.DTOs
+﻿namespace EmployeeControl.Core.Models.DTOs
 {
     public class TimeExitDto
     {
