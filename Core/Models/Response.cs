@@ -29,4 +29,3 @@
         public const string UnexpectedErrors = "An unexpected error occurred, try again later";
     }
 }
-}

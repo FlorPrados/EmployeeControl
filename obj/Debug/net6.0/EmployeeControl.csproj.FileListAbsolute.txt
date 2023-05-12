@@ -267,3 +267,4 @@ C:\Users\flore\source\repos\EmployeeControl\obj\Debug\net6.0\refint\EmployeeCont
 C:\Users\flore\source\repos\EmployeeControl\obj\Debug\net6.0\EmployeeControl.pdb
 C:\Users\flore\source\repos\EmployeeControl\obj\Debug\net6.0\EmployeeControl.genruntimeconfig.cache
 C:\Users\flore\source\repos\EmployeeControl\obj\Debug\net6.0\ref\EmployeeControl.dll
+F:\repos\EmployeeControl\bin\Debug\net6.0\Newtonsoft.Json.dll

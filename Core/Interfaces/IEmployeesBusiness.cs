@@ -6,10 +6,10 @@ namespace EmployeeControl.Core.Interfaces
     public interface IEmployeesBusiness
     {
 
-        Task<Response<bool>> Create(List<CreateEmployeeDTO> employeeDTO);
+        Task<Response<bool>> Create(CreateEmployeeDTO dto);
         Task<Response<List<EmployeeDTO>>> GetAll();
-        Task<Response<List<EmployeeDTO>>> GetById(int Id);
-        Task<Response<string>> Delete(int Id);   //string?
+        Task<Response<EmployeeDTO>> GetById(int Id);
+        Task<Response<bool>> Delete(int Id);
         Task<Response<bool>> Update(EmployeeDTO employeeDTO, int Id);
 
     }

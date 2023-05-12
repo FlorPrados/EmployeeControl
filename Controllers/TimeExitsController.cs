@@ -1,4 +1,4 @@
-﻿using EmployeeControl.Core.DTOs;
+﻿
 using EmployeeControl.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿using EmployeeControl.Core.DTOs;
+﻿using EmployeeControl.Core.Interfaces;
 using EmployeeControl.Core.Models.DTOs;
 using EmployeeControl.Entidades;
 using Microsoft.AspNetCore.Mvc;
@@ -7,136 +7,84 @@ using Newtonsoft.Json;
 
 namespace EmployeeControl.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/employees")]
     public class EmployeesController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IEmployeesBusiness _employeesBusiness;
 
-        public EmployeesController(ApplicationDbContext context)
+        public EmployeesController(IEmployeesBusiness employeesBusiness)
         {
-            this.context = context;
+            _employeesBusiness = employeesBusiness;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(EmployeeDTO employeeDTO)
-        {
+        public async Task<IActionResult> Create(CreateEmployeeDTO employee) => Ok(await _employeesBusiness.Create(employee));
 
-            var ExistingEmail = await context.Employees.AnyAsync(e => e.Email == employeeDTO.Email);
-            if (ExistingEmail)
-            {
-                return BadRequest("Ya existe un empleado con el mail " + employeeDTO.Email);
-            }
-            var employee = new Employee
-
-            {
-                Fullname = employeeDTO.Fullname,
-                Email = employeeDTO.Email
-            };
-            context.Add(employee); 
-            await context.SaveChangesAsync();    
-            return Ok();
-        }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> Get()
-        {
-            return await context.Employees.ToListAsync();
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _employeesBusiness.GetAll());
+        
 
         [HttpGet("id")]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetV2(int id)
-        {
-            var idFound = await context.Employees.AnyAsync(e => e.Id == id);
-            if (!idFound)
-            {
-                return NotFound();
-            }
-            return await context.Employees.Where(e => e.Id == id).ToListAsync();
-        }
+        public async Task<IActionResult> GetById(int Id) => Ok(await _employeesBusiness.GetById(Id));
 
 
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, EmployeeDTO employeeDTO)
-        {
-            var idFound = await context.Employees.AnyAsync(e => e.Id == id);
-            if (!idFound)
-            {
-                return NotFound();
-            }
-            var employee = new Employee
-            {
-                Fullname = employeeDTO.Fullname,
-                Email = employeeDTO.Email
-            };
-            employee.Id = id;
-            context.Update(employee);
-            await context.SaveChangesAsync();
-            return Ok();
+        public async Task<IActionResult> Update(EmployeeDTO employee, int Id) => Ok(await _employeesBusiness.Update(employee, Id));
 
-        }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            var employee = await context.Employees.FirstOrDefaultAsync(s => s.Id == id);
-            if (employee is null)
-            {
-                return NotFound();
-            }
-            context.Remove(employee);
-            await context.SaveChangesAsync();
-            return NoContent();
-        }
+        public async Task<IActionResult> Delete(int Id) => Ok(await _employeesBusiness.Delete(Id));
 
 
-        [HttpGet("{id}/horarios")]
-        public async Task<IActionResult> GetSchedule(int id)
-        {
+        //[HttpGet("{id}/horarios")]
+        //public async Task<IActionResult> GetSchedule(int id)
+        //{
        
-            var employee = await context.Employees.FindAsync(id);
-            if (employee is null)
-            {
-                return NotFound();
-            }
+        //    var employee = await context.Employees.FindAsync(id);
+        //    if (employee is null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var entrances = context.TimeEntrances
-                .Include(b => b.employee)
-                .Where(x => x.EmployeeId == id).ToList();
+        //    var entrances = context.TimeEntrances
+        //        .Include(b => b.employee)
+        //        .Where(x => x.EmployeeId == id).ToList();
 
-            var exits = context.TimeExits
-                .Include(b => b.employee)
-                .Where(x => x.EmployeeId == id).ToList();
+        //    var exits = context.TimeExits
+        //        .Include(b => b.employee)
+        //        .Where(x => x.EmployeeId == id).ToList();
 
-            var employeeSchedule = new EmployeeScheduleDto
-            {
-                FullName = employee.Fullname,
-                Email = employee.Email
-            };
+        //    var employeeSchedule = new EmployeeScheduleDto
+        //    {
+        //        FullName = employee.Fullname,
+        //        Email = employee.Email
+        //    };
 
-            entrances.ForEach(x =>
-            {
-                employeeSchedule.TimeEntrances.Add(new TimeEntranceDto
-                {
-                    Day = x.Day,
-                    Hour = x.Hour,
-                });
-            });
+        //    entrances.ForEach(x =>
+        //    {
+        //        employeeSchedule.TimeEntrances.Add(new TimeEntranceDto
+        //        {
+        //            Day = x.Day,
+        //            Hour = x.Hour,
+        //        });
+        //    });
 
-            exits.ForEach(x =>
-            {
-                employeeSchedule.TimeExits.Add(new TimeExitDto
-                {
-                    Day = x.Day,
-                    Hour = x.Hour,
+        //    exits.ForEach(x =>
+        //    {
+        //        employeeSchedule.TimeExits.Add(new TimeExitDto
+        //        {
+        //            Day = x.Day,
+        //            Hour = x.Hour,
 
-                });
-            });
+        //        });
+        //    });
 
 
-            return Ok(employeeSchedule);
+        //    return Ok(employeeSchedule);
 
-        }
+        //}
     }
 }
