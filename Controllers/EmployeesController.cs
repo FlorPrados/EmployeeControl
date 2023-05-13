@@ -3,13 +3,15 @@ using EmployeeControl.Core.Models.DTOs;
 using EmployeeControl.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EmployeeControl.Repositorio.Interfaces;
+using System;
 using Newtonsoft.Json;
 
 namespace EmployeeControl.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : ControllerBase   // or Controller ??
     {
         private readonly IEmployeesBusiness _employeesBusiness;
 
@@ -19,7 +21,7 @@ namespace EmployeeControl.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEmployeeDTO employee) => Ok(await _employeesBusiness.Create(employee));
+         public async Task<IActionResult> Create(CreateEmployeeDTO dto) => Ok(await _employeesBusiness.Create(dto));
 
 
         [HttpGet]
@@ -31,11 +33,11 @@ namespace EmployeeControl.Controllers
 
 
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(EmployeeDTO employee, int Id) => Ok(await _employeesBusiness.Update(employee, Id));
+        [HttpPut("id")]
+        public async Task<IActionResult> Update(int Id, CreateEmployeeDTO employee) => Ok(await _employeesBusiness.Update(Id, employee));
 
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("id")]
         public async Task<IActionResult> Delete(int Id) => Ok(await _employeesBusiness.Delete(Id));
 
 

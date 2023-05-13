@@ -67,10 +67,10 @@ namespace EmployeeControl.Core.Bussiness
             return response;
         }
 
-        public async Task<Response<bool>> Update(EmployeeDTO employeeDTO, int Id)
+        public async Task<Response<bool>> Update(int Id, CreateEmployeeDTO employeeDTO)
         {
 
-            var response = new Response<bool>(false);
+            var response = new Response<bool>(false);    // ? 
             var employee = await _unitOfWork.EmployeesRepository.GetById(Id);
 
             if (employee == null)
@@ -79,7 +79,9 @@ namespace EmployeeControl.Core.Bussiness
                 response.Succeeded = false;
                 return response;
             }
-            
+
+            response.Data = await _unitOfWork.EmployeesRepository.Update(EmployeeMapper.UpdateToEmployee(employee, employeeDTO));
+
             return response;
         }
     }

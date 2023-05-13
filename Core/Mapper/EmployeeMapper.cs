@@ -45,7 +45,7 @@ namespace EmployeeControl.Core.Mapper
             return null;
         }
 
-        public static Employee UpdateToEmployee(EmployeeDTO employeeDTO, Employee employee)
+        public static Employee UpdateToEmployee(Employee employee, CreateEmployeeDTO employeeDTO)
         {
 
             if (employee != null)

@@ -2,10 +2,10 @@
 
 namespace EmployeeControl.Repositorio.Interfaces
 {
-    public interface IGenericRepository<T> where T : BaseEntity
+    public interface IGenericRepository<T> where T : class
     {
 
-        Task<bool> Create(T entity);
+        Task<bool> Create(T entity); 
         Task<bool> Update(T entity);
         Task<bool> Delete(int id);
         Task<List<T>> GetAll();

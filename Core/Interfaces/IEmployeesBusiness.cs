@@ -10,7 +10,7 @@ namespace EmployeeControl.Core.Interfaces
         Task<Response<List<EmployeeDTO>>> GetAll();
         Task<Response<EmployeeDTO>> GetById(int Id);
         Task<Response<bool>> Delete(int Id);
-        Task<Response<bool>> Update(EmployeeDTO employeeDTO, int Id);
+        Task<Response<bool>> Update(int Id, CreateEmployeeDTO employeeDTO);
 
     }
 }

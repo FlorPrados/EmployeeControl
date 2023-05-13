@@ -1,4 +1,8 @@
 using EmployeeControl;
+using EmployeeControl.Core.Bussiness;
+using EmployeeControl.Core.Interfaces;
+using EmployeeControl.Repositorio;
+using EmployeeControl.Repositorio.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,13 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(opciones =>
       opciones.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings:DefaultConnection").Value));
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IEmployeesBusiness, EmployeesBusiness>();
+// builder.Services.AddScoped<ITimeEntrancesBusiness, TimeEntrancesBusiness>();      add 
 
 
 var app = builder.Build();
